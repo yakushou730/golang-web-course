@@ -19,9 +19,24 @@ func contact(w http.ResponseWriter, r *http.Request) {
 		"yakushou730@gmail.com</a>.")
 }
 
+func faq(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(w, "<h1>This is FAQ page.</h1>")
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, "<h1>This is 404 page.</h1>")
+}
+
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
 	r.HandleFunc("/contact", contact)
+	r.HandleFunc("/faq", faq)
+
+	var h http.Handler = http.HandlerFunc(notFound)
+	r.NotFoundHandler = h
 	http.ListenAndServe(":3000", r)
 }
