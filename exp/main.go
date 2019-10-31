@@ -14,7 +14,7 @@ func main() {
 	data := struct {
 		Name string
 	}{
-		"YakuShou",
+		"<script>alert('Howdy!');</script>",
 	}
 
 	err = t.Execute(os.Stdout, data)
