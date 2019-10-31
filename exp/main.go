@@ -12,9 +12,11 @@ func main() {
 	}
 
 	data := struct {
-		Name string
+		Name  string
+		Email string
 	}{
-		"<script>alert('Howdy!');</script>",
+		Name:  "<script>alert('Howdy!');</script>",
+		Email: "yakushou730@gmail.com",
 	}
 
 	err = t.Execute(os.Stdout, data)
