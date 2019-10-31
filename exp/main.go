@@ -12,11 +12,22 @@ func main() {
 	}
 
 	data := struct {
-		Name  string
-		Email string
+		Name      string
+		Email     string
+		Number    int32
+		Decimal   float32
+		TestMap   map[string]int32
+		Condition bool
 	}{
-		Name:  "<script>alert('Howdy!');</script>",
-		Email: "yakushou730@gmail.com",
+		Name:    "<script>alert('Howdy!');</script>",
+		Email:   "yakushou730@gmail.com",
+		Number:  10,
+		Decimal: 123.456,
+		TestMap: map[string]int32{
+			"Test1": 123,
+			"Test2": 456,
+		},
+		Condition: false,
 	}
 
 	err = t.Execute(os.Stdout, data)

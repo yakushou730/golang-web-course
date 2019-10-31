@@ -1,2 +1,14 @@
 <h1>Hello, {{ .Name }}!</h1>
 <h2>Email is {{ .Email }}</h2>
+<h3>Number is {{ .Number }}</h3>
+<h4>Decimal is {{ .Decimal }}</h4>
+<h5>{{ . }}</h5>
+{{ range $key, $value := .TestMap }}
+    <h1>{{ $key }} => {{ $value }}</h1>
+{{ end }}
+
+{{ if .Condition }}
+    <p>This is true</p>
+{{ else }}
+    <p>This is false</p>
+{{ end }}
