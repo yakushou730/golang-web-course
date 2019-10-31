@@ -1,64 +1,42 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gorilla/mux"
+
+	"github.com/yakushou730/golang-web-course/views"
 )
 
 var (
 	homeTemplate    *template.Template
 	contactTemplate *template.Template
+	homeView        *views.View
+	contactView     *views.View
 )
 
-func home(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := homeTemplate.Execute(w, nil); err != nil {
+	if err := homeView.Template.Execute(w, nil); err != nil {
 		panic(err)
 	}
 }
 
-func contact(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := contactTemplate.Execute(w, nil); err != nil {
+	if err := contactView.Template.Execute(w, nil); err != nil {
 		panic(err)
 	}
-}
-
-func faq(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprint(w, "<h1>This is FAQ page.</h1>")
-}
-
-func notFound(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "<h1>This is 404 page.</h1>")
 }
 
 func main() {
-	var err error
-	homeTemplate, err = template.ParseFiles(
-		"views/home.gohtml",
-		"views/layouts/footer.gohtml")
-	if err != nil {
-		panic(err)
-	}
-	contactTemplate, err = template.ParseFiles(
-		"views/contact.gohtml",
-		"views/layouts/footer.gohtml")
-	if err != nil {
-		panic(err)
-	}
+	homeView = views.NewView("views/home.gohtml")
+	contactView = views.NewView("views/contact.gohtml")
 
-	r := httprouter.New()
-	r.GET("/", home)
-	r.GET("/contact", contact)
-	r.GET("/faq", faq)
+	r := mux.NewRouter()
+	r.HandleFunc("/", home)
+	r.HandleFunc("/contact", contact)
 
-	var h http.Handler = http.HandlerFunc(notFound)
-	r.NotFound = h
 	http.ListenAndServe(":3000", r)
 }
