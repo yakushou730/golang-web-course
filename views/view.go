@@ -2,6 +2,7 @@ package views
 
 import (
 	"html/template"
+	"net/http"
 	"path/filepath"
 )
 
@@ -11,8 +12,8 @@ type View struct {
 }
 
 var (
-	LayoutDir  string = "views/layouts/"
-	TempateExt string = ".gohtml"
+	LayoutDir   string = "views/layouts/"
+	TemplateExt string = ".gohtml"
 )
 
 func NewView(layout string, files ...string) *View {
@@ -28,9 +29,13 @@ func NewView(layout string, files ...string) *View {
 }
 
 func layoutFiles() []string {
-	files, err := filepath.Glob(LayoutDir + "*" + TempateExt)
+	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)
 	if err != nil {
 		panic(err)
 	}
 	return files
+}
+
+func (v *View) Render(w http.ResponseWriter, data interface{}) error {
+	return v.Template.ExecuteTemplate(w, v.Layout, data)
 }
