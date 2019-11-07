@@ -24,20 +24,23 @@ func main() {
 	}
 
 	var id int
-	var name, email string
+	for i := 1; i < 6; i++ {
+		userId := 1
+		if i > 3 {
+			userId = 2
+		}
+		amount := 1000 * i
+		description := fmt.Sprintf("USB-C Adapter x%d", i)
 
-	rows, err := db.Query(`
-		SELECT id, name, email
-		FROM users
-		WHERE id < $1`, 5)
-	if err != nil {
-		panic(err)
+		err = db.QueryRow(`
+			INSERT INTO orders (user_id, amount, description)
+			VALUES ($1, $2, $3)
+			RETURNING id`,
+			userId, amount, description).Scan(&id)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Created an order with the ID:", id)
 	}
-
-	for rows.Next() {
-		rows.Scan(&id, &name, &email)
-		fmt.Println("ID:", id, "Name:", name, "Email", email)
-	}
-
 	db.Close()
 }
