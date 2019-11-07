@@ -22,31 +22,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected!")
-
-	// _, err = db.Exec(`
-	// INSERT INTO users(name, email)
-	// VALUES($1, $2)`,
-	// 	"yakushou", "yakushou730@gmail.com")
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	var id int
+	var name, email string
+
 	row := db.QueryRow(`
-	INSERT INTO users(name, email)
-	VALUES($1, $2) RETURNING id`,
-		"yakushou", "yakushou730@gmail.com")
-	err = row.Scan(&id)
+		SELECT id, name, email
+		FROM users
+		WHERE id=$1`, 1)
+
+	err = row.Scan(&id, &name, &email)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(id)
+	fmt.Println("ID:", id, "Name:", name, "Email", email)
 
 	db.Close()
 }
