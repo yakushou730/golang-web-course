@@ -76,6 +76,13 @@ func (us *UserService) ByEmail(email string) (*User, error) {
 	return &user, err
 }
 
+func (us *UserService) ByAge(age int) (*User, error) {
+	var user User
+	db := us.db.Where("Age = ?", age)
+	err := first(db, &user)
+	return &user, err
+}
+
 // DestructiveReset drops the user table and rebuilds it
 func (us *UserService) DestructiveReset() error {
 	err := us.db.DropTableIfExists(&User{}).Error

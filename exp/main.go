@@ -28,6 +28,7 @@ func main() {
 	us.DestructiveReset()
 
 	user := models.User{
+		Age:   18,
 		Name:  "yakushou",
 		Email: "yakushou730@gmail.com",
 	}
@@ -42,7 +43,7 @@ func main() {
 	}
 
 	// NOTE: You may need to update the query code a bit as well
-	foundUser, err := us.ByEmail("yakushou730@gmail.com")
+	foundUser, err := us.ByAge(18)
 	if err != nil {
 		panic(err)
 	}
