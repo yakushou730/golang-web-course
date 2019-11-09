@@ -34,7 +34,7 @@ func main() {
 	us.AutoMigrate()
 
 	staticC := controllers.NewStatic()
-	usersC := controllers.NewUsers()
+	usersC := controllers.NewUsers(us)
 	galleriesC := controllers.NewGalleries()
 
 	r := mux.NewRouter()
