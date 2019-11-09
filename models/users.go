@@ -83,6 +83,16 @@ func (us *UserService) ByAge(age int) (*User, error) {
 	return &user, err
 }
 
+func (us *UserService) InAgeRange(age1, age2 int) (*[]User, error) {
+	var users []User
+	db := us.db.Where("Age BETWEEN $1 AND $2", age1, age2)
+	db.Find(&users)
+	if db.Error != nil {
+		panic(db.Error)
+	}
+	return &users, nil
+}
+
 // DestructiveReset drops the user table and rebuilds it
 func (us *UserService) DestructiveReset() error {
 	err := us.db.DropTableIfExists(&User{}).Error

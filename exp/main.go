@@ -43,7 +43,7 @@ func main() {
 	}
 
 	// NOTE: You may need to update the query code a bit as well
-	foundUser, err := us.ByAge(18)
+	foundUser, err := us.InAgeRange(18, 20)
 	if err != nil {
 		panic(err)
 	}
@@ -51,13 +51,13 @@ func main() {
 	fmt.Println(foundUser)
 
 	// Delete a user
-	if err = us.Delete(foundUser.ID); err != nil {
-		panic(err)
-	}
+	// if err = us.Delete(foundUser.ID); err != nil {
+	// 	panic(err)
+	// }
 
 	// Verify the user is deleted
-	_, err = us.ByID(foundUser.ID)
-	if err != models.ErrNotFound {
-		panic("user was not deleted!")
-	}
+	// _, err = us.ByID(foundUser.ID)
+	// if err != models.ErrNotFound {
+	// 	panic("user was not deleted!")
+	// }
 }
