@@ -1,14 +1,38 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+
+	"github.com/yakushou730/golang-web-course/models"
 
 	"github.com/yakushou730/golang-web-course/controllers"
 
 	"github.com/gorilla/mux"
 )
 
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "TsengYaoShang"
+	password = ""
+	dbname   = "golang_dev"
+)
+
 func main() {
+	// Create a DB connection string and then use it to
+	// create our model services.
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"dbname=%s sslmode=disable",
+		host, port, user, dbname)
+
+	us, err := models.NewUserService(psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer us.Close()
+	us.AutoMigrate()
+
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers()
 	galleriesC := controllers.NewGalleries()
