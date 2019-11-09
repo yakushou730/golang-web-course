@@ -15,6 +15,7 @@ type Users struct {
 }
 
 type SignupForm struct {
+	Age      int    `schema:"age"`
 	Name     string `schema:"name"`
 	Email    string `schema:"email"`
 	Password string `schema:"password"`
@@ -39,6 +40,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	user := models.User{
+		Age:   form.Age,
 		Name:  form.Name,
 		Email: form.Email,
 	}
