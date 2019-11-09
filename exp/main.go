@@ -27,12 +27,19 @@ func main() {
 	defer us.Close()
 	us.DestructiveReset()
 
-	// This will error because you DO NOT have a user with
-	// this ID, but we will create on soon.
-	user, err := us.ByID(1)
+	user := models.User{
+		Name:  "yakushou",
+		Email: "yakushou730@gmail.com",
+	}
+	if err := us.Create(&user); err != nil {
+		panic(err)
+	}
+
+	// NOTE: You may need to update the query code a bit as well
+	foundUser, err := us.ByID(1)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(user)
+	fmt.Println(foundUser)
 }
