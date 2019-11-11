@@ -18,6 +18,8 @@ var (
 	// ErrInvalidID is returned when an invalid ID is provided
 	// to a method like Delete.
 	ErrInvalidID = errors.New("models: ID provided was invalid")
+
+	userPwPepper = "secret-random-string"
 )
 
 type User struct {
@@ -110,7 +112,7 @@ func (us *UserService) DestructiveReset() error {
 // Create will create the provided user and backfill data
 // like the ID, createdAT, and updatedAt fields.
 func (us *UserService) Create(user *User) error {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password+userPwPepper), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
