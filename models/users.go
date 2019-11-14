@@ -3,13 +3,14 @@ package models
 import (
 	"errors"
 
+	"github.com/yakushou730/golang-web-course/hash"
+
 	"github.com/yakushou730/golang-web-course/rand"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -28,6 +29,9 @@ var (
 	ErrInvalidPassword = errors.New("models: incorrect password provided")
 )
 
+// I prefer constants near the top of the source file
+const hmacSecretKey = "secret-hmac-key"
+
 type User struct {
 	gorm.Model
 	Age          int
@@ -40,7 +44,8 @@ type User struct {
 }
 
 type UserService struct {
-	db *gorm.DB
+	db   *gorm.DB
+	hmac hash.HMAC
 }
 
 func NewUserService(connectionInfo string) (*UserService, error) {
@@ -49,8 +54,10 @@ func NewUserService(connectionInfo string) (*UserService, error) {
 		return nil, err
 	}
 	db.LogMode(true)
+	hmac := hash.NewHMAC(hmacSecretKey)
 	return &UserService{
-		db: db,
+		db:   db,
+		hmac: hmac,
 	}, nil
 }
 
