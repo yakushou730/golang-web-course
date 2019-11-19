@@ -103,6 +103,13 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 func (u *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("remember_token")
 	if err != nil {
+		cookie := http.Cookie{
+			Name:     "redirect_referral",
+			Value:    r.URL.Path,
+			HttpOnly: true,
+		}
+		http.SetCookie(w, &cookie)
+
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
