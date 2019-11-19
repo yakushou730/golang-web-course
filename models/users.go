@@ -115,6 +115,19 @@ func (us *UserService) InAgeRange(age1, age2 int) (*[]User, error) {
 	return &users, nil
 }
 
+// ByRemember looks up a user with the given remember token
+// and returns that user. This method will handle hashing
+// the token for us.
+func (us *UserService) ByRemember(token string) (*User, error) {
+	var user User
+	rememberHash := us.hmac.Hash(token)
+	err := first(us.db.Where("remember_hash = ?", rememberHash), &user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 // DestructiveReset drops the user table and rebuilds it
 func (us *UserService) DestructiveReset() error {
 	err := us.db.DropTableIfExists(&User{}).Error
