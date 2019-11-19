@@ -142,6 +142,8 @@ func (us *UserService) Create(user *User) error {
 		user.Remember = token
 	}
 
+	user.RememberHash = us.hmac.Hash(user.Remember)
+
 	return us.db.Create(user).Error
 }
 
@@ -159,6 +161,9 @@ func first(db *gorm.DB, dst interface{}) error {
 // Update will update the provided user with all of the data
 // in the provided user object.
 func (us *UserService) Update(user *User) error {
+	if user.Remember != "" {
+		user.RememberHash = us.hmac.Hash(user.Remember)
+	}
 	return us.db.Save(user).Error
 }
 
