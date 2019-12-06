@@ -45,7 +45,20 @@ type User struct {
 	RememberHash string `gorm:"not null;unique_index"`
 }
 
-type UserService struct {
+type userService struct {
+	UserDB
+}
+
+// User service is a set of methods used to manipulate and
+// work with the user model
+type UserService interface {
+	// Authenticate will verify the provided email address and
+	// password are correct. If they are correct, the user
+	// corresponding to that email will be returned. Otherwise
+	// You will receive either:
+	// ErrNotFound, ErrInvalidPassword, or another error if
+	// something goes wrong.
+	Authenticate(email, password string) (*User, error)
 	UserDB
 }
 
@@ -109,12 +122,18 @@ func newUserGorm(connectionInfo string) (*userGorm, error) {
 	}, nil
 }
 
-func NewUserService(connectionInfo string) (*UserService, error) {
+func NewUserService(connectionInfo string) (UserService, error) {
 	ug, err := newUserGorm(connectionInfo)
 	if err != nil {
 		return nil, err
 	}
-	return &UserService{
+	// We also need to update how we construct the user service.
+	// We no longer have a UserService type to construct, and
+	// instead need to use the userService type.
+	// This IS still a pointer, as our functions implementing
+	// the UserService are done with pointer receivers. eg:
+	// func (us *userService) <- this uses a pointer
+	return &userService{
 		UserDB: userValidator{
 			UserDB: ug,
 		},
@@ -268,7 +287,7 @@ func (ug *userGorm) AutoMigrate() error {
 // user, nil
 // Otherwise if another error is encountered this will return
 // nil, error
-func (us *UserService) Authenticate(email, password string) (*User, error) {
+func (us *userService) Authenticate(email, password string) (*User, error) {
 	foundUser, err := us.ByEmail(email)
 	if err != nil {
 		return nil, err
