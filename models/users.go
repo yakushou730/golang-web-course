@@ -29,6 +29,10 @@ var (
 	// is used when attempting to authenticate a user.
 	ErrInvalidPassword = errors.New("models: incorrect password provided")
 
+	// ErrEmailRequired is returned when an email address is
+	// not provided when creating a user
+	ErrEmailRequired = errors.New("models: email address is required")
+
 	_ UserDB = &userGorm{}
 )
 
@@ -298,7 +302,8 @@ func (uv *userValidator) Create(user *User) error {
 		uv.bcryptPassword,
 		uv.setRememberIfUnset,
 		uv.hmacRemember,
-		uv.normalizeEmail)
+		uv.normalizeEmail,
+		uv.requireEmail)
 	if err != nil {
 		return nil
 	}
@@ -310,7 +315,8 @@ func (uv *userValidator) Update(user *User) error {
 	err := runUserValFns(user,
 		uv.bcryptPassword,
 		uv.hmacRemember,
-		uv.normalizeEmail)
+		uv.normalizeEmail,
+		uv.requireEmail)
 	if err != nil {
 		return err
 	}
@@ -402,4 +408,11 @@ func (uv *userValidator) ByEmail(email string) (*User, error) {
 		return nil, err
 	}
 	return uv.UserDB.ByEmail(user.Email)
+}
+
+func (uv *userValidator) requireEmail(user *User) error {
+	if user.Email == "" {
+		return ErrEmailRequired
+	}
+	return nil
 }
