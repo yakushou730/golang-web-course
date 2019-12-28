@@ -107,6 +107,7 @@ type userGorm struct {
 // UserDB in our interface chane.
 type userValidator struct {
 	UserDB
+	hmac hash.HMAC
 }
 
 func newUserGorm(connectionInfo string) (*userGorm, error) {
@@ -127,16 +128,16 @@ func NewUserService(connectionInfo string) (UserService, error) {
 	if err != nil {
 		return nil, err
 	}
-	// We also need to update how we construct the user service.
-	// We no longer have a UserService type to construct, and
-	// instead need to use the userService type.
-	// This IS still a pointer, as our functions implementing
-	// the UserService are done with pointer receivers. eg:
-	// func (us *userService) <- this uses a pointer
+
+	// this old line was in newUserGorm
+	hmac := hash.NewHMAC(hmacSecretKey)
+	uv := &userValidator{
+		UserDB: ug,
+		hmac:   hmac,
+	}
+
 	return &userService{
-		UserDB: userValidator{
-			UserDB: ug,
-		},
+		UserDB: uv,
 	}, nil
 }
 
@@ -195,11 +196,10 @@ func (ug *userGorm) InAgeRange(age1, age2 int) (*[]User, error) {
 }
 
 // ByRemember looks up a user with the given remember token
-// and returns that user. This method will handle hashing
-// the token for us.
-func (ug *userGorm) ByRemember(token string) (*User, error) {
+// and returns that user. This method expects the remember
+// token to already be hashed.
+func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 	var user User
-	rememberHash := ug.hmac.Hash(token)
 	err := first(ug.db.Where("remember_hash = ?", rememberHash), &user)
 	if err != nil {
 		return nil, err
@@ -304,4 +304,11 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	default:
 		return nil, err
 	}
+}
+
+// ByRemember will hash the remember token and then call
+// ByRemember on the subsequent UserDB layer.
+func (uv *userValidator) ByRemember(token string) (*User, error) {
+	rememberHash := uv.hmac.Hash(token)
+	return uv.UserDB.ByRemember(rememberHash)
 }
