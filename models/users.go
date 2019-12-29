@@ -20,15 +20,15 @@ var (
 	// in the database
 	ErrNotFound = errors.New("models: resource not found")
 
-	// ErrInvalidID is returned when an invalid ID is provided
+	// ErrIDInvalid is returned when an invalid ID is provided
 	// to a method like Delete.
-	ErrInvalidID = errors.New("models: ID provided was invalid")
+	ErrIDInvalid = errors.New("models: ID provided was invalid")
 
 	userPwPepper = "secret-random-string"
 
-	// ErrInvalidPassword is returned when an invalid password
+	// ErrPasswordIncorrect is returned when an invalid password
 	// is used when attempting to authenticate a user.
-	ErrInvalidPassword = errors.New("models: incorrect password provided")
+	ErrPasswordIncorrect = errors.New("models: incorrect password provided")
 
 	// ErrEmailRequired is returned when an email address is
 	// not provided when creating a user
@@ -68,7 +68,7 @@ type UserService interface {
 	// password are correct. If they are correct, the user
 	// corresponding to that email will be returned. Otherwise
 	// You will receive either:
-	// ErrNotFound, ErrInvalidPassword, or another error if
+	// ErrNotFound, ErrPasswordIncorrect, or another error if
 	// something goes wrong.
 	Authenticate(email, password string) (*User, error)
 	UserDB
@@ -271,7 +271,7 @@ func (ug *userGorm) AutoMigrate() error {
 // If the email address provided is invalid, this will return
 // nil, ErrNotFound
 // If the password provided is invalid, this will return
-// nil, ErrInvalidPassword
+// nil, ErrPasswordIncorrect
 // If the email and password are both valid, this will return
 // user, nil
 // Otherwise if another error is encountered this will return
@@ -289,7 +289,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 	case nil:
 		return foundUser, nil
 	case bcrypt.ErrMismatchedHashAndPassword:
-		return nil, ErrInvalidPassword
+		return nil, ErrPasswordIncorrect
 	default:
 		return nil, err
 	}
@@ -401,7 +401,7 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 func (uv *userValidator) idGreaterThan(n uint) userValFn {
 	return userValFn(func(user *User) error {
 		if user.ID <= n {
-			return ErrInvalidID
+			return ErrIDInvalid
 		}
 		return nil
 	})
