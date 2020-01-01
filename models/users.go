@@ -40,6 +40,9 @@ var (
 
 	ErrEmailTaken = errors.New("models: email address is already taken")
 
+	ErrPasswordTooShout = errors.New("models: password must " +
+		"be at least 8 characters long")
+
 	_ UserDB = &userGorm{}
 )
 
@@ -311,6 +314,7 @@ func (uv *userValidator) ByRemember(token string) (*User, error) {
 // like the ID, CreatedAt, and UpdatedAt fields.
 func (uv *userValidator) Create(user *User) error {
 	err := runUserValFns(user,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.setRememberIfUnset,
 		uv.hmacRemember,
@@ -327,6 +331,7 @@ func (uv *userValidator) Create(user *User) error {
 // Update will hash a remember token if it is provided.
 func (uv *userValidator) Update(user *User) error {
 	err := runUserValFns(user,
+		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.hmacRemember,
 		uv.normalizeEmail,
@@ -462,6 +467,16 @@ func (uv *userValidator) emailIsAvail(user *User) error {
 	// are updating, or if we have a conflict.
 	if user.ID != existing.ID {
 		return ErrEmailTaken
+	}
+	return nil
+}
+
+func (uv *userValidator) passwordMinLength(user *User) error {
+	if user.Password == "" {
+		return nil
+	}
+	if len(user.Password) < 8 {
+		return ErrPasswordTooShout
 	}
 	return nil
 }
