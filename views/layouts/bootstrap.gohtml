@@ -11,7 +11,8 @@
     {{ template "navbar" }}
 
     <div class="container-fluid">
-        <!-- Our content will go here... somehow -->
+        {{ template "alert" }}
+
         {{ template "yield" .}}
 
         {{ template "footer" }}
