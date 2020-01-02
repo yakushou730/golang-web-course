@@ -29,16 +29,6 @@ type LoginForm struct {
 	Password string `schema:"password"`
 }
 
-type Alert struct {
-	Level   string
-	Message string
-}
-
-type Data struct {
-	Alert *Alert
-	Yield interface{}
-}
-
 func NewUsers(us models.UserService) *Users {
 	return &Users{
 		NewView:   views.NewView("bootstrap", "users/new"),
@@ -48,11 +38,11 @@ func NewUsers(us models.UserService) *Users {
 }
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request) {
-	alert := Alert{
-		Level:   "success",
+	alert := views.Alert{
+		Level:   views.AlertLvlSuccess,
 		Message: "Successfully rendered a dynamic alert!",
 	}
-	data := Data{
+	data := views.Data{
 		Alert: &alert,
 		Yield: "This can be any data b/c its type is interface",
 	}
