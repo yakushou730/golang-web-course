@@ -29,6 +29,11 @@ type LoginForm struct {
 	Password string `schema:"password"`
 }
 
+type Alert struct {
+	Level   string
+	Message string
+}
+
 func NewUsers(us models.UserService) *Users {
 	return &Users{
 		NewView:   views.NewView("bootstrap", "users/new"),
@@ -38,7 +43,11 @@ func NewUsers(us models.UserService) *Users {
 }
 
 func (u *Users) New(w http.ResponseWriter, r *http.Request) {
-	if err := u.NewView.Render(w, nil); err != nil {
+	alert := Alert{
+		Level:   "success",
+		Message: "Successfully rendered a dynamic alert!",
+	}
+	if err := u.NewView.Render(w, alert); err != nil {
 		panic(err)
 	}
 }
