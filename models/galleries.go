@@ -20,7 +20,24 @@ type galleryGorm struct {
 	db *gorm.DB
 }
 
+type galleryService struct {
+	GalleryDB
+}
+
+type galleryValidator struct {
+	GalleryDB
+}
+
+func NewGalleryService(db *gorm.DB) GalleryService {
+	return &galleryService{
+		GalleryDB: &galleryValidator{
+			GalleryDB: &galleryGorm{
+				db: db,
+			},
+		},
+	}
+}
+
 func (gg *galleryGorm) Create(gallery *Gallery) error {
-	// TODO: Implement this later
-	return nil
+	return gg.db.Create(gallery).Error
 }

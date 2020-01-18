@@ -9,7 +9,7 @@ func NewServices(connectionInfo string) (*Services, error) {
 	}
 	db.LogMode(true)
 	return &Services{
-		Gallery: &galleryGorm{},
+		Gallery: NewGalleryService(db),
 		User:    NewUserService(db),
 		db:      db,
 	}, nil
