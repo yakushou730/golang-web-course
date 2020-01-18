@@ -27,7 +27,6 @@ func NewGalleries(gs models.GalleryService) *Galleries {
 
 // POST /galleries
 func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("TEST")
 	var vd views.Data
 	var form GalleryForm
 	if err := parseForm(r, &form); err != nil {
