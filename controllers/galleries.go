@@ -1,21 +1,19 @@
 package controllers
 
 import (
-	"net/http"
+	"github.com/yakushou730/golang-web-course/models"
 
 	"github.com/yakushou730/golang-web-course/views"
 )
 
 type Galleries struct {
-	NewView *views.View
+	New *views.View
+	gs  models.GalleryService
 }
 
-func NewGalleries() *Galleries {
+func NewGalleries(gs models.GalleryService) *Galleries {
 	return &Galleries{
-		NewView: views.NewView("bootstrap", "galleries/new"),
+		New: views.NewView("bootstrap", "galleries/new"),
+		gs:  gs,
 	}
-}
-
-func (g *Galleries) New(w http.ResponseWriter, r *http.Request) {
-	g.NewView.Render(w, nil)
 }
