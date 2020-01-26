@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/yakushou730/golang-web-course/context"
+
 	"github.com/yakushou730/golang-web-course/models"
 
 	"github.com/yakushou730/golang-web-course/views"
@@ -34,8 +36,12 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 		g.New.Render(w, vd)
 		return
 	}
+
+	user := context.User(r.Context())
+
 	gallery := models.Gallery{
-		Title: form.Title,
+		Title:  form.Title,
+		UserID: user.ID,
 	}
 	if err := g.gs.Create(&gallery); err != nil {
 		vd.SetAlert(err)
