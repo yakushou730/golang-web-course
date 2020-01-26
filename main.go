@@ -35,9 +35,10 @@ func main() {
 	defer services.Close()
 	services.AutoMigrate()
 
+	r := mux.NewRouter()
 	staticC := controllers.NewStatic()
 	usersC := controllers.NewUsers(services.User)
-	galleriesC := controllers.NewGalleries(services.Gallery)
+	galleriesC := controllers.NewGalleries(services.Gallery, r)
 
 	requireUserMw := middleware.RequireUser{
 		UserService: services.User,
@@ -48,7 +49,6 @@ func main() {
 	// galleriesC.Create is an http.HandlerFunc, so we use ApplyFn
 	createGallery := requireUserMw.ApplyFn(galleriesC.Create)
 
-	r := mux.NewRouter()
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
 	r.Handle("/faq", staticC.Faq).Methods("GET")
@@ -58,7 +58,8 @@ func main() {
 	r.HandleFunc("/login", usersC.Login).Methods("POST")
 	r.Handle("/galleries/new", newGallery).Methods("GET")
 	r.HandleFunc("/galleries", createGallery).Methods("POST")
-	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).Methods("GET")
+	r.HandleFunc("/galleries/{id:[0-9]+}", galleriesC.Show).
+		Methods("GET").Name(controllers.ShowGallery)
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r)

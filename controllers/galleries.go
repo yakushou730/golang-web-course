@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,21 +13,27 @@ import (
 	"github.com/yakushou730/golang-web-course/views"
 )
 
+const (
+	ShowGallery = "show_gallery"
+)
+
 type Galleries struct {
 	New      *views.View
 	ShowView *views.View
 	gs       models.GalleryService
+	r        *mux.Router
 }
 
 type GalleryForm struct {
 	Title string `schema:"title"`
 }
 
-func NewGalleries(gs models.GalleryService) *Galleries {
+func NewGalleries(gs models.GalleryService, r *mux.Router) *Galleries {
 	return &Galleries{
 		New:      views.NewView("bootstrap", "galleries/new"),
 		ShowView: views.NewView("bootstrap", "galleries/show"),
 		gs:       gs,
+		r:        r,
 	}
 }
 
@@ -53,7 +58,19 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 		g.New.Render(w, vd)
 		return
 	}
-	fmt.Fprintln(w, gallery)
+	url, err := g.r.Get(ShowGallery).URL("id",
+		strconv.Itoa(int(gallery.ID)))
+	// Check for errors creating the URL
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+	// If no errors, use the URL we just created and redirect
+	// to the path portion of that URL. We don't need the
+	// entire URL because your application might be hosted at
+	// localhost:3000, ot it might be at yakushou.pro. By
+	// only using the path our code is agnostic to that detail.
+	http.Redirect(w, r, url.Path, http.StatusFound)
 }
 
 // GET /galleries/:id
