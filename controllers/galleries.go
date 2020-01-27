@@ -130,3 +130,36 @@ func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	vd.Yield = gallery
 	g.EditView.Render(w, vd)
 }
+
+// POST /galleries/:id/update
+func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryById(w, r)
+	if err != nil {
+		return
+	}
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "You do not have permission to edit "+
+			"this gallery", http.StatusForbidden)
+		return
+	}
+	var vd views.Data
+	vd.Yield = gallery
+	var form GalleryForm
+	if err := parseForm(r, &form); err != nil {
+		// If there is an error we are going to render the
+		// EditView again with an alert message.
+		vd.SetAlert(err)
+		g.EditView.Render(w, vd)
+		return
+	}
+	gallery.Title = form.Title
+	// TODO: Persist this gallery change in the DB after
+	// we add an Update method to our GalleryService in the
+	// models package.
+	vd.Alert = &views.Alert{
+		Level:   views.AlertLvlSuccess,
+		Message: "Gallery updated successfully!",
+	}
+	g.EditView.Render(w, vd)
+}
