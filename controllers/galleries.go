@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -169,4 +170,42 @@ func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	// Error or not, we are going to render the EditView with
 	// our updated information.
 	g.EditView.Render(w, vd)
+}
+
+// POST /galleries/:id/delete
+func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
+	// Lookup the gallery using the galleryByID we wrote earlier
+	gallery, err := g.galleryById(w, r)
+	if err != nil {
+		// If there is an error the galleryByID will have rendered
+		// it for us already
+		return
+	}
+	// We also need to retrieve the user and verify they have
+	// permission to delete this gallery. This means we will
+	// need to use the RequireUser middleware on any routes
+	// mapped to this method.
+	user := context.User(r.Context())
+	if gallery.UserID != user.ID {
+		http.Error(w, "You do not have permission to edit "+
+			"this gallery", http.StatusForbidden)
+		return
+	}
+
+	var vd views.Data
+	err = g.gs.Delete(gallery.ID)
+	if err != nil {
+		// If there is an error we want to set an alert and
+		// render the edit page with the error. We also need
+		// to set the Yield to gallery so that the EditView
+		// is rendered correctly.
+		vd.SetAlert(err)
+		vd.Yield = gallery
+		g.EditView.Render(w, vd)
+		return
+	}
+	// TODO: We will eventually want to redirect to the index
+	// page that lists all galleries this user owns, but for
+	// now a success message will suffice.
+	fmt.Fprintln(w, "successfully deleted!")
 }
