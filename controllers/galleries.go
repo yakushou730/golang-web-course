@@ -49,7 +49,7 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 	var form GalleryForm
 	if err := parseForm(r, &form); err != nil {
 		vd.SetAlert(err)
-		g.New.Render(w, vd)
+		g.New.Render(w, r, vd)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := g.gs.Create(&gallery); err != nil {
 		vd.SetAlert(err)
-		g.New.Render(w, vd)
+		g.New.Render(w, r, vd)
 		return
 	}
 	url, err := g.r.Get(EditGallery).URL("id",
@@ -89,7 +89,7 @@ func (g *Galleries) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	var vd views.Data
 	vd.Yield = gallery
-	g.ShowView.Render(w, vd)
+	g.ShowView.Render(w, r, vd)
 }
 
 func (g *Galleries) galleryById(w http.ResponseWriter, r *http.Request) (*models.Gallery, error) {
@@ -132,7 +132,7 @@ func (g *Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 	var vd views.Data
 	vd.Yield = gallery
-	g.EditView.Render(w, vd)
+	g.EditView.Render(w, r, vd)
 }
 
 // POST /galleries/:id/update
@@ -154,7 +154,7 @@ func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 		// If there is an error we are going to render the
 		// EditView again with an alert message.
 		vd.SetAlert(err)
-		g.EditView.Render(w, vd)
+		g.EditView.Render(w, r, vd)
 		return
 	}
 	gallery.Title = form.Title
@@ -172,7 +172,7 @@ func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	// Error or not, we are going to render the EditView with
 	// our updated information.
-	g.EditView.Render(w, vd)
+	g.EditView.Render(w, r, vd)
 }
 
 // POST /galleries/:id/delete
@@ -204,7 +204,7 @@ func (g *Galleries) Delete(w http.ResponseWriter, r *http.Request) {
 		// is rendered correctly.
 		vd.SetAlert(err)
 		vd.Yield = gallery
-		g.EditView.Render(w, vd)
+		g.EditView.Render(w, r, vd)
 		return
 	}
 	url, err := g.r.Get(IndexGalleries).URL()
@@ -225,6 +225,5 @@ func (g *Galleries) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	var vd views.Data
 	vd.Yield = galleries
-	g.IndexView.Render(w, vd)
-
+	g.IndexView.Render(w, r, vd)
 }
