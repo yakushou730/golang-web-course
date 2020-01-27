@@ -154,12 +154,19 @@ func (g *Galleries) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	gallery.Title = form.Title
-	// TODO: Persist this gallery change in the DB after
-	// we add an Update method to our GalleryService in the
-	// models package.
-	vd.Alert = &views.Alert{
-		Level:   views.AlertLvlSuccess,
-		Message: "Gallery updated successfully!",
+	err = g.gs.Update(gallery)
+	// If there is an err our alert will be an error. Otherwise
+	// we will still render an alert, but instead it will be
+	// a success message.
+	if err != nil {
+		vd.SetAlert(err)
+	} else {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlSuccess,
+			Message: "Gallery updated successfully!",
+		}
 	}
+	// Error or not, we are going to render the EditView with
+	// our updated information.
 	g.EditView.Render(w, vd)
 }
