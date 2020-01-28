@@ -51,6 +51,10 @@ func main() {
 	// galleriesC.Create is an http.HandlerFunc, so we use ApplyFn
 	createGallery := requireUserMw.ApplyFn(galleriesC.Create)
 
+	// Image routes
+	imageHandler := http.FileServer(http.Dir("./images/"))
+	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", imageHandler))
+
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
 	r.Handle("/faq", staticC.Faq).Methods("GET")
