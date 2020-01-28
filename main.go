@@ -81,6 +81,9 @@ func main() {
 	r.HandleFunc("/galleries/{id:[0-9]+}/images",
 		requireUserMw.ApplyFn(galleriesC.ImageUpload)).
 		Methods("POST")
+	r.HandleFunc("/galleries/{id:[0-9]+}/images/{filename}/delete",
+		requireUserMw.ApplyFn(galleriesC.ImageDelete)).
+		Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", userMw.Apply(r))
