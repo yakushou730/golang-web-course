@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 
@@ -16,17 +17,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "TsengYaoShang"
-	password = ""
-	dbname   = "golang_dev"
-)
-
 func main() {
-	cfg := DefaultConfig()
-	dbCfg := DefaultPostgresConfig()
+	boolPtr := flag.Bool("prod", false, "Provide this flag "+
+		"in production. This ensures that a .config file is "+
+		"provided before the application starts.")
+	flag.Parse()
+	// boolPtr is a pointer to a boolean, so we need to use
+	// *boolPtr to get the boolean value and pass it into our
+	// LoadConfig function
+	cfg := LoadConfig(*boolPtr)
+	dbCfg := cfg.Database
 	// This isn't complete, but we will come back to it shortly
 	services, err := models.NewServices(
 		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
