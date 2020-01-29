@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -72,7 +73,8 @@ func (g *Galleries) Create(w http.ResponseWriter, r *http.Request) {
 		strconv.Itoa(int(gallery.ID)))
 	// Check for errors creating the URL
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusFound)
+		log.Println(err)
+		http.Redirect(w, r, "/galleries", http.StatusFound)
 		return
 	}
 	// If no errors, use the URL we just created and redirect
@@ -101,6 +103,7 @@ func (g *Galleries) galleryById(w http.ResponseWriter, r *http.Request) (*models
 	idStr := vars["id"]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Invalid gallery ID", http.StatusNotFound)
 		return nil, err
 	}
@@ -110,6 +113,7 @@ func (g *Galleries) galleryById(w http.ResponseWriter, r *http.Request) (*models
 		case models.ErrNotFound:
 			http.Error(w, "Gallery not found", http.StatusNotFound)
 		default:
+			log.Println(err)
 			http.Error(w, "Whoops! Something went wrong.", http.StatusInternalServerError)
 		}
 		return nil, err
@@ -226,6 +230,7 @@ func (g *Galleries) Index(w http.ResponseWriter, r *http.Request) {
 	user := context.User(r.Context())
 	galleries, err := g.gs.ByUserID(user.ID)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Somethings went wrong.", http.StatusInternalServerError)
 		return
 	}
@@ -315,6 +320,7 @@ func (g *Galleries) ImageDelete(w http.ResponseWriter, r *http.Request) {
 	// If all goes well, redirect to the edit gallery page.
 	url, err := g.r.Get(EditGallery).URL("id", fmt.Sprintf("%v", gallery.ID))
 	if err != nil {
+		log.Println(err)
 		http.Redirect(w, r, "/galleries", http.StatusFound)
 		return
 	}
