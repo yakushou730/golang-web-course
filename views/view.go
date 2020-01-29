@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 	"path/filepath"
 
 	"github.com/gorilla/csrf"
@@ -37,6 +38,9 @@ func NewView(layout string, files ...string) *View {
 			// returning an error as the second argument will cause our template
 			// package to return an error when executed.
 			return "", errors.New("csrfField is not implemented")
+		},
+		"pathEscape": func(s string) string {
+			return url.PathEscape(s)
 		},
 	}).ParseFiles(files...)
 	if err != nil {
