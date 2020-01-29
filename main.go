@@ -27,8 +27,16 @@ const (
 func main() {
 	cfg := DefaultConfig()
 	dbCfg := DefaultPostgresConfig()
-
-	services, err := models.NewServices(dbCfg.Dialect(), dbCfg.ConnectionInfo())
+	// This isn't complete, but we will come back to it shortly
+	services, err := models.NewServices(
+		models.WithGorm(dbCfg.Dialect(), dbCfg.ConnectionInfo()),
+		models.WithLogMode(!cfg.IsProd()),
+		// We want each of these services, but if we didn't need
+		// one of them we could possibly skip that config func
+		models.WithUser(cfg.Pepper, cfg.HMACKey),
+		models.WithGallery(),
+		models.WithImage(),
+	)
 	if err != nil {
 		panic(err)
 	}
