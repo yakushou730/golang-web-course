@@ -97,6 +97,7 @@ func main() {
 		requireUserMw.ApplyFn(galleriesC.ImageDelete)).
 		Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
+	r.Handle("/logout", requireUserMw.ApplyFn(usersC.Logout)).Methods("POST")
 
 	b, err := rand.Bytes(32)
 	if err != nil {
