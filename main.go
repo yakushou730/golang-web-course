@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/csrf"
+	"github.com/yakushou730/golang-web-course/rand"
+
 	"github.com/yakushou730/golang-web-course/middleware"
 
 	"github.com/yakushou730/golang-web-course/models"
@@ -90,5 +93,14 @@ func main() {
 		Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", userMw.Apply(r))
+
+	// TODO: Update this to be a config variable
+	isProd := false
+	b, err := rand.Bytes(32)
+	if err != nil {
+		panic(err)
+	}
+	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
+
+	http.ListenAndServe(":3000", csrfMw(userMw.Apply(r)))
 }
