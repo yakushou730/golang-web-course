@@ -25,13 +25,10 @@ const (
 )
 
 func main() {
-	// Create a DB connection string and then use it to
-	// create our model services.
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"dbname=%s sslmode=disable",
-		host, port, user, dbname)
+	cfg := DefaultConfig()
+	dbCfg := DefaultPostgresConfig()
 
-	services, err := models.NewServices(psqlInfo)
+	services, err := models.NewServices(dbCfg.Dialect(), dbCfg.ConnectionInfo())
 	if err != nil {
 		panic(err)
 	}
@@ -92,15 +89,16 @@ func main() {
 		requireUserMw.ApplyFn(galleriesC.ImageDelete)).
 		Methods("POST")
 	r.HandleFunc("/cookietest", usersC.CookieTest).Methods("GET")
-	fmt.Println("Starting the server on :3000...")
 
-	// TODO: Update this to be a config variable
-	isProd := false
 	b, err := rand.Bytes(32)
 	if err != nil {
 		panic(err)
 	}
-	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
+	// Use the config's IsProd method instead
+	csrfMw := csrf.Protect(b, csrf.Secure(cfg.IsProd()))
 
-	http.ListenAndServe(":3000", csrfMw(userMw.Apply(r)))
+	fmt.Printf("Starting the server on :%d...", cfg.Port)
+
+	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port),
+		csrfMw(userMw.Apply(r)))
 }
