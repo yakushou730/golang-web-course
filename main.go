@@ -54,6 +54,10 @@ func main() {
 	// Image routes
 	imageHandler := http.FileServer(http.Dir("./images/"))
 	r.PathPrefix("/images/").Handler(http.StripPrefix("/images/", imageHandler))
+	// Assets
+	assetHandler := http.FileServer(http.Dir("./assets/"))
+	assetHandler = http.StripPrefix("/assets/", assetHandler)
+	r.PathPrefix("/assets/").Handler(assetHandler)
 
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
