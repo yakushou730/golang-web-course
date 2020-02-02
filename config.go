@@ -14,6 +14,12 @@ type PostgresConfig struct {
 	Name     string `json:"name"`
 }
 
+type MailgunConfig struct {
+	APIKey       string `json:"api_key"`
+	PublicAPIKey string `json:"public_api_key"`
+	Domain       string `json:"domain"`
+}
+
 func (c PostgresConfig) Dialect() string {
 	return "postgres"
 }
@@ -46,6 +52,7 @@ type Config struct {
 	HMACKey string `json:"hmac_Key"`
 	// We are adding the Database nested structure with this new field
 	Database PostgresConfig `json:"database"`
+	Mailgun  MailgunConfig  `json:"mailgun"`
 }
 
 func (c Config) IsProd() bool {

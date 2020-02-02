@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/yakushou730/golang-web-course/email"
+
 	"github.com/yakushou730/golang-web-course/context"
 
 	"github.com/yakushou730/golang-web-course/rand"
@@ -18,6 +20,7 @@ type Users struct {
 	NewView   *views.View
 	LoginView *views.View
 	us        models.UserService
+	emailer   *email.Client
 }
 
 type SignupForm struct {
@@ -32,11 +35,12 @@ type LoginForm struct {
 	Password string `schema:"password"`
 }
 
-func NewUsers(us models.UserService) *Users {
+func NewUsers(us models.UserService, emailer *email.Client) *Users {
 	return &Users{
 		NewView:   views.NewView("bootstrap", "users/new"),
 		LoginView: views.NewView("bootstrap", "users/login"),
 		us:        us,
+		emailer:   emailer,
 	}
 }
 
